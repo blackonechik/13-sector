@@ -228,6 +228,12 @@ export function DisplayClient() {
               >
                 Что? Где? Когда?
               </h1>
+              <p
+                className="mt-4 text-2xl font-black uppercase text-[var(--accent-soft)] sm:text-3xl"
+                style={{ fontFamily: 'var(--font-playfair)' }}
+              >
+                13 сектор
+              </p>
             </div>
           </motion.div>
         )}
@@ -268,7 +274,7 @@ export function DisplayClient() {
                 key={snapshot.currentQuestion.id}
                 author={snapshot.currentQuestion.author ?? undefined}
                 question={snapshot.currentQuestion.text}
-                sectorLabel={targetSector ? `13 Сектор` : 'Вопрос'}
+                sectorLabel={targetSector ? `13 сектор` : 'Вопрос'}
               />
             </motion.div>
           </motion.div>
@@ -554,7 +560,10 @@ function QuestionRevealCard({
                   transition={{ duration: 0.45 }}
                   className="space-y-6 text-center"
                 >
-                  <p className="text-sm uppercase tracking-[0.42em] text-[var(--accent-soft)]">
+                  <p
+                    className="mt-1 text-2xl font-black uppercase text-[var(--accent-soft)] sm:text-3xl"
+                    style={{ fontFamily: 'var(--font-playfair)' }}
+                  >
                     {sectorLabel}
                   </p>
                   <h2
