@@ -1,16 +1,21 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import { GameProvider } from "@/lib/GameContext";
+import type { Metadata } from "next";
+import { Manrope, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin", "cyrillic"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin", "cyrillic"],
 });
+
+export const metadata: Metadata = {
+  title: "Что Где Когда",
+  description: "Тёмная панель управления и экран показа вопросов для интеллектуальной игры",
+};
 
 export default function RootLayout({
   children,
@@ -20,13 +25,11 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      className={`${manrope.variable} ${playfairDisplay.variable} h-full dark`}
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-background text-foreground">
-        <GameProvider>
-          {children}
-        </GameProvider>
+      <body className="min-h-full bg-background text-foreground antialiased">
+        {children}
       </body>
     </html>
   );

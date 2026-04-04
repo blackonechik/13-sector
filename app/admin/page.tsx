@@ -1,27 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Button,
-  Card,
-  Input,
-  TextArea,
-  Dialog,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-  Link,
-  Label,
-} from '@heroui/react';
+import Link from 'next/link';
+import { Button, Card, Chip, Input, TextArea } from '@heroui/react';
 import { useGame } from '@/lib/GameContext';
 
 export default function AdminPanel() {
   const { questions, addQuestion, removeQuestion, resetGame } = useGame();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [newQuestion, setNewQuestion] = useState({
     text: '',
     answer: '',
@@ -36,180 +21,203 @@ export default function AdminPanel() {
         author: newQuestion.author || undefined,
       });
       setNewQuestion({ text: '', answer: '', author: '' });
-      setIsModalOpen(false);
     }
   };
 
+  const usedCount = questions.filter((question) => question.used).length;
+  const availableCount = questions.length - usedCount;
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">13 Сектор</h1>
-          <p className="text-gray-600">Панель управления вопросами</p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-4 mb-8 flex-wrap">
-          <Button variant="primary" size="lg" onPress={() => setIsModalOpen(true)}>
-            + Добавить вопрос
-          </Button>
-          <Button
-            variant="secondary"
-            size="lg"
-            as={Link}
-            href="/display"
-            target="_blank"
-          >
-            🎮 Запустить режим показа
-          </Button>
-          <Button variant="tertiary" size="lg" onPress={resetGame}>
-            ↻ Сбросить использованные
-          </Button>
-        </div>
-
-        {/* Statistics */}
-        <Card>
-          <Card.Section className="flex-row gap-8 py-6 px-6">
-            <div>
-              <p className="text-gray-600 text-sm">Всего вопросов</p>
-              <p className="text-3xl font-bold text-blue-600">{questions.length}</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-sm">Использовано</p>
-              <p className="text-3xl font-bold text-orange-600">
-                {questions.filter(q => q.used).length}
+    <main className="app-shell min-h-screen px-5 py-6 sm:px-8 sm:py-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <header className="panel gold-frame relative overflow-hidden rounded-[2rem] px-6 py-7 sm:px-8">
+          <div className="ornament opacity-45" />
+          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-soft)]">
+                Панель ведущего
+              </p>
+              <h1
+                className="text-4xl font-black uppercase text-white sm:text-5xl"
+                style={{ fontFamily: 'var(--font-playfair)' }}
+              >
+                Что Где Когда
+              </h1>
+              <p className="max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
+                Добавляйте вопросы, управляйте пулом и открывайте режим показа на отдельном
+                экране. Все изменения синхронизируются между вкладками автоматически.
               </p>
             </div>
-            <div>
-              <p className="text-gray-600 text-sm">Доступно</p>
-              <p className="text-3xl font-bold text-green-600">
-                {questions.filter(q => !q.used).length}
-              </p>
-            </div>
-          </Card.Section>
-        </Card>
 
-        {/* Questions Table */}
-        {questions.length > 0 ? (
-          <Card className="mt-8">
-            <Card.Header className="flex justify-between items-center px-6 py-4">
-              <h2 className="text-xl font-semibold">Список вопросов</h2>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/10 px-5 text-sm font-medium text-white transition hover:bg-white/6"
+              >
+                На главную
+              </Link>
+              <Link
+                href="/display"
+                target="_blank"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-[var(--accent)] px-5 text-sm font-semibold text-[#16120d] transition hover:bg-[#c79a54]"
+              >
+                Открыть режим показа
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        <section className="grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+          <Card className="panel rounded-[1.75rem] border border-white/8 bg-[var(--surface-strong)]">
+            <Card.Header className="flex flex-col items-start gap-2 px-6 pt-6">
+              <Card.Title className="text-2xl font-bold text-white">Новый вопрос</Card.Title>
+              <Card.Description className="text-sm text-[var(--muted)]">
+                Поля ниже обновляют общий пул вопросов сразу после добавления.
+              </Card.Description>
             </Card.Header>
-            <Card.Section>
-              <Table aria-label="Таблица вопросов" className="bg-transparent">
-                <TableHeader>
-                  <TableColumn>№</TableColumn>
-                  <TableColumn>Вопрос</TableColumn>
-                  <TableColumn>Ответ</TableColumn>
-                  <TableColumn>Автор</TableColumn>
-                  <TableColumn>Статус</TableColumn>
-                  <TableColumn>Действия</TableColumn>
-                </TableHeader>
-                <TableBody>
-                  {questions.map((q, idx) => (
-                    <TableRow key={q.id}>
-                      <TableCell>{idx + 1}</TableCell>
-                      <TableCell className="max-w-xs">
-                        <p className="line-clamp-2">{q.text}</p>
-                      </TableCell>
-                      <TableCell className="max-w-xs">
-                        <p className="line-clamp-2 text-gray-600">{q.answer}</p>
-                      </TableCell>
-                      <TableCell>{q.author || '—'}</TableCell>
-                      <TableCell>
-                        <Chip
-                          variant="flat"
-                          color={q.used ? 'default' : 'success'}
-                          size="sm"
-                        >
-                          {q.used ? 'Использован' : 'Доступен'}
-                        </Chip>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          color="danger"
-                          onPress={() => removeQuestion(q.id)}
-                        >
-                          🗑️
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card.Body>
-          </Card>
-        ) : (
-          <Card>
-            <Card.Body className="text-center py-16">
-              <p className="text-gray-500 text-lg">Вопросы не загружены</p>
-              <Button color="primary" onPress={onOpen} className="mt-4">
-                Добавить первый вопрос
-              </Button>
-            </Card.Body>
-          </Card>
-        )}
-      </div>
+            <Card.Content className="space-y-4 px-6 pb-6">
+              <TextArea
+                aria-label="Текст вопроса"
+                placeholder="Введите формулировку вопроса"
+                value={newQuestion.text}
+                onChange={(event) =>
+                  setNewQuestion((previous) => ({ ...previous, text: event.target.value }))
+                }
+                rows={4}
+                className="w-full"
+              />
+              <TextArea
+                aria-label="Правильный ответ"
+                placeholder="Введите правильный ответ"
+                value={newQuestion.answer}
+                onChange={(event) =>
+                  setNewQuestion((previous) => ({ ...previous, answer: event.target.value }))
+                }
+                rows={3}
+                className="w-full"
+              />
+              <Input
+                aria-label="Автор"
+                placeholder="Автор вопроса, если нужен"
+                value={newQuestion.author}
+                onChange={(event) =>
+                  setNewQuestion((previous) => ({ ...previous, author: event.target.value }))
+                }
+                className="w-full"
+              />
 
-      {/* Modal for adding question */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="lg">
-        <Modal.Content>
-          {(onClose) => (
-            <>
-              <Modal.Header className="flex flex-col gap-1">
-                Добавить новый вопрос
-              </Modal.Header>
-              <Modal.Body>
-                <Textarea
-                  label="Вопрос"
-                  placeholder="Введите текст вопроса"
-                  value={newQuestion.text}
-                  onValueChange={(text) =>
-                    setNewQuestion(prev => ({ ...prev, text }))
-                  }
-                  minRows={3}
-                />
-                <Textarea
-                  label="Ответ"
-                  placeholder="Введите правильный ответ"
-                  value={newQuestion.answer}
-                  onValueChange={(answer) =>
-                    setNewQuestion(prev => ({ ...prev, answer }))
-                  }
-                  minRows={2}
-                />
-                <Input
-                  label="Автор (опционально)"
-                  placeholder="Имя автора вопроса"
-                  value={newQuestion.author}
-                  onValueChange={(author) =>
-                    setNewQuestion(prev => ({ ...prev, author }))
-                  }
-                />
-              </Modal.Body>
-              <Modal.Footer>
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                 <Button
-                  color="danger"
-                  variant="light"
-                  onPress={onClose}
-                >
-                  Отмена
-                </Button>
-                <Button
-                  color="primary"
                   onPress={handleAddQuestion}
+                  className="min-h-12 flex-1 bg-[var(--accent)] font-semibold text-[#16120d]"
                 >
-                  Добавить
+                  Добавить вопрос
                 </Button>
-              </Modal.Footer>
-            </>
+                <Button
+                  variant="ghost"
+                  onPress={resetGame}
+                  className="min-h-12 flex-1 border border-white/10 text-white hover:bg-white/6"
+                >
+                  Сбросить отметки использования
+                </Button>
+              </div>
+            </Card.Content>
+          </Card>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Card className="panel rounded-[1.75rem] border border-white/8 bg-[var(--surface-strong)]">
+              <Card.Content className="space-y-3 px-6 py-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-[var(--muted)]">Всего</p>
+                <p className="text-4xl font-black text-white">{questions.length}</p>
+                <p className="text-sm text-[var(--muted)]">Вопросов в общей базе</p>
+              </Card.Content>
+            </Card>
+
+            <Card className="panel rounded-[1.75rem] border border-white/8 bg-[var(--surface-strong)]">
+              <Card.Content className="space-y-3 px-6 py-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-[var(--muted)]">В игре</p>
+                <p className="text-4xl font-black text-[var(--accent-soft)]">{availableCount}</p>
+                <p className="text-sm text-[var(--muted)]">Ещё доступны к показу</p>
+              </Card.Content>
+            </Card>
+
+            <Card className="panel rounded-[1.75rem] border border-white/8 bg-[var(--surface-strong)]">
+              <Card.Content className="space-y-3 px-6 py-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-[var(--muted)]">Сыграно</p>
+                <p className="text-4xl font-black text-[#d96852]">{usedCount}</p>
+                <p className="text-sm text-[var(--muted)]">Уже были открыты в показе</p>
+              </Card.Content>
+            </Card>
+          </div>
+        </section>
+
+        <section className="panel gold-frame overflow-hidden rounded-[2rem]">
+          <div className="flex items-center justify-between border-b border-white/8 px-6 py-5">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Пул вопросов</h2>
+              <p className="mt-1 text-sm text-[var(--muted)]">
+                Можно сразу удалять лишние позиции. Пул вопросов берётся из localStorage и
+                обновляется между вкладками автоматически.
+              </p>
+            </div>
+          </div>
+
+          {questions.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-white/8 text-left text-xs uppercase tracking-[0.25em] text-[var(--muted)]">
+                    <th className="px-6 py-4">№</th>
+                    <th className="px-6 py-4">Вопрос</th>
+                    <th className="px-6 py-4">Ответ</th>
+                    <th className="px-6 py-4">Автор</th>
+                    <th className="px-6 py-4">Статус</th>
+                    <th className="px-6 py-4 text-right">Действие</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {questions.map((question, index) => (
+                    <tr key={question.id} className="border-b border-white/6 align-top">
+                      <td className="px-6 py-5 text-sm text-[var(--muted)]">{index + 1}</td>
+                      <td className="px-6 py-5 text-sm leading-6 text-white">
+                        {question.text}
+                      </td>
+                      <td className="px-6 py-5 text-sm leading-6 text-[#d7dced]">
+                        {question.answer}
+                      </td>
+                      <td className="px-6 py-5 text-sm text-[var(--muted)]">
+                        {question.author || '—'}
+                      </td>
+                      <td className="px-6 py-5">
+                        <Chip
+                          color={question.used ? 'danger' : 'accent'}
+                          variant="soft"
+                          className={question.used ? 'bg-[#4a1f1a] text-[#f3b7ab]' : 'bg-[#342916] text-[#f2ddb1]'}
+                        >
+                          {question.used ? 'Сыгран' : 'Готов'}
+                        </Chip>
+                      </td>
+                      <td className="px-6 py-5 text-right">
+                        <Button
+                          variant="ghost"
+                          onPress={() => removeQuestion(question.id)}
+                          className="border border-white/10 text-white hover:bg-white/6"
+                        >
+                          Удалить
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="px-6 py-16 text-center text-[var(--muted)]">
+              Вопросов пока нет. Добавьте первый вопрос в форму выше.
+            </div>
           )}
-        </Modal.Content>
-      </Modal>
-    </div>
+        </section>
+      </div>
+    </main>
   );
 }
