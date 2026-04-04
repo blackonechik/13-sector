@@ -14,7 +14,7 @@ const playfairDisplay = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Что Где Когда",
-  description: "Тёмная панель управления и экран показа вопросов для интеллектуальной игры",
+  description: "Приём вопросов для 13 сектора ЧГК",
 };
 
 export default function RootLayout({
