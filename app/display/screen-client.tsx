@@ -549,13 +549,6 @@ function QuestionRevealCard({
           className="mx-auto max-w-xl"
         >
           <div>
-            <motion.div
-              initial={{ rotateX: 0 }}
-              animate={{ rotateX: -162 }}
-              transition={{ duration: 1.05, ease: [0.18, 0.82, 0.2, 1] }}
-              style={{ transformOrigin: 'top center' }}
-              className="absolute inset-x-0 top-0 h-24 origin-top rounded-t-[1.8rem] border-b border-[rgba(243,211,158,0.22)] bg-[linear-gradient(180deg,_rgba(181,138,70,0.38),_rgba(78,56,24,0.95))]"
-            />
             <AnimatePresence>
               {textVisible && (
                 <motion.div
