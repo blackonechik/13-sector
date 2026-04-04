@@ -254,12 +254,12 @@ export function DisplayClient() {
               selectionFocused={selectionFocused}
             />
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="mt-10 text-center">
-              <p className="text-sm uppercase tracking-[0.4em] text-[var(--accent-soft)]">Выбор вопроса</p>
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-[var(--muted)] sm:text-sm">
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
-                  Всего прислано: {snapshot.totals.submitted}
-                </span>
-              </div>
+              <h2
+                className="text-3xl font-black uppercase text-[var(--accent-soft)] sm:text-5xl"
+                style={{ fontFamily: 'var(--font-playfair)' }}
+              >
+                Всего прислано: {snapshot.totals.submitted}
+              </h2>
             </motion.div>
           </motion.div>
         )}
@@ -490,16 +490,14 @@ function EnvelopeCard({
   return (
     <motion.div
       layoutId={layoutId}
-      className={`relative h-40 w-full max-w-[11rem] overflow-hidden rounded-[1.4rem] ${
-        highlighted
-          ? 'shadow-[0_0_42px_rgba(181,138,70,0.32)]'
-          : 'shadow-[0_12px_40px_rgba(0,0,0,0.2)]'
-      } ${className}`}
+      className={`relative h-40 w-full max-w-[11rem] overflow-hidden rounded-[1.4rem] ${highlighted
+        ? 'shadow-[0_0_42px_rgba(181,138,70,0.32)]'
+        : 'shadow-[0_12px_40px_rgba(0,0,0,0.2)]'
+        } ${className}`}
     >
       <div
-        className={`absolute inset-0 rounded-[1.4rem] border ${
-          highlighted ? 'border-[#f3d39e]' : 'border-white/8'
-        } bg-[linear-gradient(180deg,_rgba(44,32,16,0.98),_rgba(16,12,7,0.98))]`}
+        className={`absolute inset-0 rounded-[1.4rem] border ${highlighted ? 'border-[#f3d39e]' : 'border-white/8'
+          } bg-[linear-gradient(180deg,_rgba(44,32,16,0.98),_rgba(16,12,7,0.98))]`}
       />
       <div className="absolute inset-[1px] rounded-[1.35rem] bg-[linear-gradient(135deg,_rgba(181,138,70,0.28),_rgba(255,255,255,0.03)_45%,_rgba(181,138,70,0.08))]" />
       <div className="absolute left-4 right-4 top-4 h-px bg-[linear-gradient(90deg,_transparent,_rgba(243,211,158,0.55),_transparent)]" />
@@ -550,7 +548,7 @@ function QuestionRevealCard({
           transition={{ duration: 0.9, ease: [0.18, 0.82, 0.2, 1] }}
           className="mx-auto max-w-xl"
         >
-          <div className="relative overflow-hidden rounded-[1.8rem] border border-[var(--border)] bg-[linear-gradient(180deg,_rgba(40,29,14,0.98),_rgba(17,13,8,0.98))] px-8 pb-8 pt-16">
+          <div>
             <motion.div
               initial={{ rotateX: 0 }}
               animate={{ rotateX: -162 }}
@@ -558,7 +556,6 @@ function QuestionRevealCard({
               style={{ transformOrigin: 'top center' }}
               className="absolute inset-x-0 top-0 h-24 origin-top rounded-t-[1.8rem] border-b border-[rgba(243,211,158,0.22)] bg-[linear-gradient(180deg,_rgba(181,138,70,0.38),_rgba(78,56,24,0.95))]"
             />
-            <div className="absolute left-1/2 top-12 h-3 w-3 -translate-x-1/2 rounded-full bg-[var(--accent-soft)] shadow-[0_0_18px_rgba(243,211,158,0.55)]" />
             <AnimatePresence>
               {textVisible && (
                 <motion.div
