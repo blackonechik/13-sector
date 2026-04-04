@@ -7,8 +7,8 @@ export default async function Home() {
   const settings = await getSubmissionSettings();
 
   return (
-    <main className="app-shell flex min-h-screen items-center justify-center px-6 py-12">
-      <section className="panel gold-frame relative w-full max-w-5xl overflow-hidden rounded-[2rem] px-8 py-10 sm:px-12 sm:py-14">
+    <main className="app-shell flex min-h-screen items-center justify-center px-4 py-8 sm:px-6 sm:py-12">
+      <section className="panel gold-frame relative w-full max-w-5xl overflow-hidden rounded-[2rem] px-4 py-6 sm:px-8 sm:py-10 md:px-12 md:py-14">
         <div className="ornament opacity-50" />
         <div className="relative flex gap-10 flex-col">
           <div className="space-y-8">

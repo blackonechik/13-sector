@@ -16,6 +16,9 @@ const emptySnapshot: GameSnapshot = {
   currentQuestionId: null,
   gameState: 'waiting',
   selectedIndex: null,
+  totals: {
+    submitted: 0,
+  },
 };
 
 export function DisplayClient() {
@@ -252,6 +255,11 @@ export function DisplayClient() {
             />
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="mt-10 text-center">
               <p className="text-sm uppercase tracking-[0.4em] text-[var(--accent-soft)]">Выбор вопроса</p>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-[var(--muted)] sm:text-sm">
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                  Всего прислано: {snapshot.totals.submitted}
+                </span>
+              </div>
             </motion.div>
           </motion.div>
         )}

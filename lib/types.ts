@@ -25,6 +25,9 @@ export interface GameSnapshot {
   currentQuestionId: string | null;
   gameState: GameState;
   selectedIndex: number | null;
+  totals: {
+    submitted: number;
+  };
 }
 
 export interface AdminQuestionPayload {

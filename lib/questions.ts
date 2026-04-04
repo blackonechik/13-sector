@@ -25,6 +25,10 @@ type GameStateRow = {
   selected_index: number | null;
 };
 
+type TotalsRow = {
+  submitted: string;
+};
+
 function mapQuestion(row: QuestionRow): Question {
   return {
     id: row.id,
@@ -115,10 +119,31 @@ async function listApprovedQuestions(client?: PoolClient) {
   return result.rows.map(mapQuestion);
 }
 
+async function getQuestionTotals(client?: PoolClient) {
+  const result = client
+    ? await client.query<TotalsRow>(`
+      SELECT
+        COUNT(*)::text AS submitted
+      FROM questions
+    `)
+    : await query<TotalsRow>(`
+      SELECT
+        COUNT(*)::text AS submitted
+      FROM questions
+    `);
+
+  const row = result.rows[0];
+
+  return {
+    submitted: Number(row?.submitted ?? 0),
+  };
+}
+
 async function getGameSnapshotWithClient(client?: PoolClient): Promise<GameSnapshot> {
-  const [questions, gameState] = await Promise.all([
+  const [questions, gameState, totals] = await Promise.all([
     listApprovedQuestions(client),
     getGameStateRow(client),
+    getQuestionTotals(client),
   ]);
 
   const currentQuestion = questions.find((question) => question.id === gameState.current_question_id) ?? null;
@@ -145,6 +170,7 @@ async function getGameSnapshotWithClient(client?: PoolClient): Promise<GameSnaps
     currentQuestionId: currentQuestion?.id ?? null,
     gameState: computedState,
     selectedIndex: gameState.selected_index,
+    totals,
   };
 }
 

@@ -53,9 +53,9 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
   };
 
   return (
-    <div className='flex gap-4 flex-col'>
+    <div className="flex flex-col gap-3 sm:gap-4">
         <h2
-          className="text-3xl font-black uppercase text-white"
+          className="text-2xl font-black uppercase text-white sm:text-3xl"
           style={{ fontFamily: 'var(--font-playfair)' }}
         >
           Форма для отправки вопроса
@@ -68,7 +68,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
         )}
 
         {!message ? (
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
             <TextArea
               aria-label="Ваш вопрос"
               placeholder="Напишите ваш вопрос"
@@ -104,7 +104,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
             </Button>
           </form>
         ) : (
-          <div className="rounded-2xl border border-[#345d42] bg-[#0f1f15] px-5 py-6 text-center">
+          <div className="rounded-2xl border border-[#345d42] bg-[#0f1f15] px-4 py-5 text-center sm:px-5 sm:py-6">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#5bb179] bg-[#183222] text-2xl text-[#8ad3a0]">
               ✓
             </div>
