@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 13 Sector
 
-## Getting Started
+Приложение для игры "Что? Где? Когда?" с публичной формой приема вопросов, защищенной админ-панелью и режимом показа для ведущего.
 
-First, run the development server:
+## Что реализовано
+
+- Публичная главная страница с отправкой вопросов.
+- Хранение всех вопросов и состояния игры в PostgreSQL.
+- Авторизация администратора по логину/паролю (cookie session).
+- Защищенные страницы `/admin` и `/display`.
+- Админ может:
+  - модерировать вопросы,
+  - добавлять вопросы вручную,
+  - настраивать прием вопросов (вкл/выкл + окно по времени).
+- Режим показа работает только для авторизованного администратора.
+
+## Локальный запуск (без Docker)
+
+1. Поднимите PostgreSQL и создайте базу.
+2. Создайте `.env.local` на основе `.env.example`.
+3. Установите зависимости и запустите приложение:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Приложение будет доступно на `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Запуск через Docker Compose
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+docker compose up --build
+```
 
-## Learn More
+Сервисы:
 
-To learn more about Next.js, take a look at the following resources:
+- `app`: Next.js приложение (`http://localhost:3000`)
+- `db`: PostgreSQL (`localhost:5432`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Для входа в админку по умолчанию:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Логин: `admin`
+- Пароль: `admin123`
 
-## Deploy on Vercel
+Обязательно поменяйте `SESSION_SECRET` и пароль перед деплоем.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Основные маршруты
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/` - публичная форма приема вопросов
+- `/login` - вход администратора
+- `/admin` - админ-панель (только после входа)
+- `/display` - режим показа (только после входа)
+
+## Переменные окружения
+
+- `DATABASE_URL` - подключение к PostgreSQL
+- `ADMIN_USERNAME` - логин администратора
+- `ADMIN_PASSWORD` - пароль администратора
+- `SESSION_SECRET` - секрет подписи cookie-сессии
+
+## Деплой
+
+Для production используйте безопасные значения `ADMIN_PASSWORD` и `SESSION_SECRET`, а также отдельный managed PostgreSQL.

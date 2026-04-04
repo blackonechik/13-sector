@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { isAuthenticatedAdmin } from '@/lib/auth';
 
-export async function requireAdminApi(request: NextRequest) {
+export async function requireAdminApi() {
   const authenticated = await isAuthenticatedAdmin();
 
   if (!authenticated) {

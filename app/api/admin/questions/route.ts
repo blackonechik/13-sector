@@ -4,8 +4,9 @@ import { requireAdminApi, jsonError } from '@/lib/guards';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
-  const unauthorized = await requireAdminApi(request);
+export async function GET(_request: NextRequest) {
+  void _request;
+  const unauthorized = await requireAdminApi();
   if (unauthorized) {
     return unauthorized;
   }
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const unauthorized = await requireAdminApi(request);
+  const unauthorized = await requireAdminApi();
   if (unauthorized) {
     return unauthorized;
   }

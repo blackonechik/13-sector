@@ -4,8 +4,9 @@ import { requireAdminApi } from '@/lib/guards';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
-  const unauthorized = await requireAdminApi(request);
+export async function GET(_request: NextRequest) {
+  void _request;
+  const unauthorized = await requireAdminApi();
   if (unauthorized) {
     return unauthorized;
   }
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const unauthorized = await requireAdminApi(request);
+  const unauthorized = await requireAdminApi();
   if (unauthorized) {
     return unauthorized;
   }
@@ -26,10 +27,11 @@ export async function PATCH(request: NextRequest) {
     submissionsEndAt?: string | null;
   } | null;
 
+  const current = await getSubmissionSettings();
   const settings = await updateSubmissionSettings({
-    submissionsEnabled: Boolean(body?.submissionsEnabled),
-    submissionsStartAt: body?.submissionsStartAt ?? null,
-    submissionsEndAt: body?.submissionsEndAt ?? null,
+    submissionsEnabled: body?.submissionsEnabled ?? current.submissionsEnabled,
+    submissionsStartAt: body?.submissionsStartAt ?? current.submissionsStartAt,
+    submissionsEndAt: body?.submissionsEndAt ?? current.submissionsEndAt,
   });
 
   return NextResponse.json({ settings });

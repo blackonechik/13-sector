@@ -1,5 +1,4 @@
 import { Pool, PoolClient, QueryResultRow } from 'pg';
-import { getDatabaseUrl } from '@/lib/env';
 
 declare global {
   var __appPool: Pool | undefined;
@@ -7,8 +6,9 @@ declare global {
 }
 
 function createPool() {
+  const connectionString = process.env.DATABASE_URL ?? 'postgres://postgres:postgres@127.0.0.1:5432/postgres';
   return new Pool({
-    connectionString: getDatabaseUrl(),
+    connectionString,
   });
 }
 

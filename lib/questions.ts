@@ -66,6 +66,13 @@ async function getSettingsRow() {
   `);
 
   const row = result.rows[0];
+  if (!row) {
+    return {
+      submissionsEnabled: true,
+      submissionsStartAt: null,
+      submissionsEndAt: null,
+    };
+  }
 
   return {
     submissionsEnabled: row.submissions_enabled,
@@ -75,26 +82,54 @@ async function getSettingsRow() {
 }
 
 async function getGameStateRow(client?: PoolClient) {
-  const executor = client ?? { query };
-  const result = await executor.query<GameStateRow>(`
-    SELECT current_question_id, game_state, selected_index
-    FROM game_state
-    WHERE id = 1
-  `);
+  const result = client
+    ? await client.query<GameStateRow>(`
+      SELECT current_question_id, game_state, selected_index
+      FROM game_state
+      WHERE id = 1
+    `)
+    : await query<GameStateRow>(`
+      SELECT current_question_id, game_state, selected_index
+      FROM game_state
+      WHERE id = 1
+    `);
 
   return result.rows[0];
 }
 
 async function listApprovedQuestions(client?: PoolClient) {
-  const executor = client ?? { query };
-  const result = await executor.query<QuestionRow>(`
-    SELECT id, text, answer, author, status, used, created_at, updated_at
-    FROM questions
-    WHERE status = 'approved'
-    ORDER BY created_at ASC
-  `);
+  const result = client
+    ? await client.query<QuestionRow>(`
+      SELECT id, text, answer, author, status, used, created_at, updated_at
+      FROM questions
+      WHERE status = 'approved'
+      ORDER BY created_at ASC
+    `)
+    : await query<QuestionRow>(`
+      SELECT id, text, answer, author, status, used, created_at, updated_at
+      FROM questions
+      WHERE status = 'approved'
+      ORDER BY created_at ASC
+    `);
 
   return result.rows.map(mapQuestion);
+}
+
+async function getGameSnapshotWithClient(client?: PoolClient): Promise<GameSnapshot> {
+  const [questions, gameState] = await Promise.all([
+    listApprovedQuestions(client),
+    getGameStateRow(client),
+  ]);
+
+  const currentQuestion = questions.find((question) => question.id === gameState.current_question_id) ?? null;
+
+  return {
+    questions,
+    currentQuestion,
+    currentQuestionId: currentQuestion?.id ?? null,
+    gameState: questions.length === 0 ? 'waiting' : gameState.game_state,
+    selectedIndex: gameState.selected_index,
+  };
 }
 
 export async function getSubmissionSettings(): Promise<SubmissionSettings> {
@@ -246,20 +281,7 @@ export async function deleteQuestion(id: string) {
 }
 
 export async function getGameSnapshot(): Promise<GameSnapshot> {
-  const [questions, gameState] = await Promise.all([
-    listApprovedQuestions(),
-    getGameStateRow(),
-  ]);
-
-  const currentQuestion = questions.find((question) => question.id === gameState.current_question_id) ?? null;
-
-  return {
-    questions,
-    currentQuestion,
-    currentQuestionId: currentQuestion?.id ?? null,
-    gameState: questions.length === 0 ? 'waiting' : gameState.game_state,
-    selectedIndex: gameState.selected_index,
-  };
+  return getGameSnapshotWithClient();
 }
 
 export async function runGameAction(action: 'pick' | 'reveal' | 'answer' | 'next' | 'reset') {
@@ -272,7 +294,7 @@ export async function runGameAction(action: 'pick' | 'reveal' | 'answer' | 'next
       await client.query(
         `UPDATE game_state SET current_question_id = NULL, game_state = 'waiting', selected_index = NULL, updated_at = NOW() WHERE id = 1`
       );
-      return getGameSnapshot();
+      return getGameSnapshotWithClient(client);
     }
 
     if (action === 'pick') {
@@ -282,7 +304,7 @@ export async function runGameAction(action: 'pick' | 'reveal' | 'answer' | 'next
         await client.query(
           `UPDATE game_state SET current_question_id = NULL, game_state = 'finished', selected_index = NULL, updated_at = NOW() WHERE id = 1`
         );
-        return getGameSnapshot();
+        return getGameSnapshotWithClient(client);
       }
 
       const selected = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
@@ -297,24 +319,24 @@ export async function runGameAction(action: 'pick' | 'reveal' | 'answer' | 'next
         [selected.id, selectedIndex]
       );
 
-      return getGameSnapshot();
+      return getGameSnapshotWithClient(client);
     }
 
     if (action === 'reveal') {
       if (!state.current_question_id) {
-        return getGameSnapshot();
+        return getGameSnapshotWithClient(client);
       }
 
       await client.query(
         `UPDATE game_state SET game_state = 'question', updated_at = NOW() WHERE id = 1`
       );
 
-      return getGameSnapshot();
+      return getGameSnapshotWithClient(client);
     }
 
     if (action === 'answer') {
       if (!state.current_question_id) {
-        return getGameSnapshot();
+        return getGameSnapshotWithClient(client);
       }
 
       await client.query(
@@ -325,7 +347,7 @@ export async function runGameAction(action: 'pick' | 'reveal' | 'answer' | 'next
         `UPDATE game_state SET game_state = 'answer', updated_at = NOW() WHERE id = 1`
       );
 
-      return getGameSnapshot();
+      return getGameSnapshotWithClient(client);
     }
 
     const remainingQuestions = questions.filter(
@@ -345,6 +367,6 @@ export async function runGameAction(action: 'pick' | 'reveal' | 'answer' | 'next
       [remainingQuestions.length > 0 ? 'waiting' : 'finished']
     );
 
-    return getGameSnapshot();
+    return getGameSnapshotWithClient(client);
   });
 }

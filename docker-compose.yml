@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: chgk-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: chgk
+      POSTGRES_USER: chgk
+      POSTGRES_PASSWORD: chgk
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chgk -d chgk"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chgk-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://chgk:chgk@db:5432/chgk
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin123
+      SESSION_SECRET: change-this-secret-before-production
+
+volumes:
+  pgdata:

@@ -8,7 +8,7 @@ export async function PATCH(
   request: NextRequest,
   context: RouteContext<'/api/admin/questions/[id]'>
 ) {
-  const unauthorized = await requireAdminApi(request);
+  const unauthorized = await requireAdminApi();
   if (unauthorized) {
     return unauthorized;
   }
@@ -32,10 +32,11 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   context: RouteContext<'/api/admin/questions/[id]'>
 ) {
-  const unauthorized = await requireAdminApi(request);
+  void _request;
+  const unauthorized = await requireAdminApi();
   if (unauthorized) {
     return unauthorized;
   }
