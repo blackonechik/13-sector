@@ -569,7 +569,7 @@ function QuestionRevealCard({
                     className="mt-1 text-2xl font-black uppercase text-[var(--accent-soft)] sm:text-3xl"
                     style={{ fontFamily: 'var(--font-playfair)' }}
                   >
-                    {sectorLabel}
+                    Вопрос:
                   </p>
                   <h2
                     className="text-4xl font-black leading-tight text-white sm:text-6xl"
