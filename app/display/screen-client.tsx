@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, useTransition } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button, Card } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GameSnapshot } from '@/lib/types';
@@ -19,6 +19,7 @@ const emptySnapshot: GameSnapshot = {
 };
 
 export function DisplayClient() {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [snapshot, setSnapshot] = useState<GameSnapshot>(emptySnapshot);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +41,7 @@ export function DisplayClient() {
     }
   }, []);
 
-  const runAction = useCallback((action: 'pick' | 'reveal' | 'answer' | 'next' | 'reset') => {
+  const runAction = useCallback((action: 'pick' | 'reveal' | 'answer' | 'next') => {
     startTransition(async () => {
       const response = await fetch('/api/admin/game', {
         method: 'POST',
@@ -95,7 +96,7 @@ export function DisplayClient() {
           toggleFullscreen();
           break;
         case 'KeyC':
-          runAction('reset');
+          // reset flow removed: shown questions must not reappear automatically
           break;
         default:
           break;
@@ -352,8 +353,8 @@ export function DisplayClient() {
           </Button>
         )}
         {!hasNoQuestions && snapshot.gameState === 'finished' && (
-          <Button size="lg" onPress={() => runAction('reset')} className="min-h-13 rounded-full bg-[var(--accent)] px-8 font-semibold text-[#16120d]">
-            Начать заново
+          <Button size="lg" isDisabled className="min-h-13 rounded-full bg-white/8 px-8 font-semibold text-white/70">
+            Все вопросы сыграны
           </Button>
         )}
 
@@ -369,12 +370,19 @@ export function DisplayClient() {
         </Button>
       </div>
 
-      <Link
-        href="/admin"
+      <Button
+        onPress={() => {
+          if (window.history.length > 1) {
+            router.back();
+            return;
+          }
+
+          router.push('/admin');
+        }}
         className="absolute left-6 top-6 z-[70] inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white transition hover:bg-white/10"
       >
-        Вернуться в админку
-      </Link>
+        Назад
+      </Button>
     </main>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useState, useTransition } from 'react';
-import { Button, Card, Input, TextArea } from '@heroui/react';
+import { Button, Input, TextArea } from '@heroui/react';
 import { SubmissionSettings } from '@/lib/types';
 
 export function PublicQuestionForm({ settings }: { settings: SubmissionSettings }) {
@@ -53,16 +53,12 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
   };
 
   return (
-    <Card className="panel rounded-[2rem] border border-white/10 bg-[var(--surface-strong)]">
-      <Card.Header className="flex-col items-start gap-3 px-6 pt-6 sm:px-8">
-        <p className="text-xs uppercase tracking-[0.35em] text-[var(--accent-soft)]">
-          Форма участника
-        </p>
+    <div className='flex gap-4 flex-col'>
         <h2
           className="text-3xl font-black uppercase text-white"
           style={{ fontFamily: 'var(--font-playfair)' }}
         >
-          Отправить вопрос
+          Форма для отправки вопроса
         </h2>
         <p className="text-sm text-[var(--muted)]">{availabilityLabel}</p>
         {(startLabel || endLabel) && (
@@ -70,46 +66,55 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
             {startLabel ? `С: ${startLabel}` : 'С: сразу'} {endLabel ? `• До: ${endLabel}` : ''}
           </p>
         )}
-      </Card.Header>
-      <Card.Content className="space-y-3 px-6 pb-6 sm:px-8 sm:pb-8">
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <TextArea
-            aria-label="Ваш вопрос"
-            placeholder="Напишите формулировку вопроса"
-            rows={4}
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-            disabled={!settings.acceptingQuestions || isPending}
-            className="w-full"
-          />
-          <TextArea
-            aria-label="Ответ"
-            placeholder="Напишите правильный ответ"
-            rows={3}
-            value={answer}
-            onChange={(event) => setAnswer(event.target.value)}
-            disabled={!settings.acceptingQuestions || isPending}
-            className="w-full"
-          />
-          <Input
-            aria-label="Имя автора"
-            placeholder="Ваше имя (по желанию)"
-            value={author}
-            onChange={(event) => setAuthor(event.target.value)}
-            disabled={!settings.acceptingQuestions || isPending}
-            className="w-full"
-          />
-          <Button
-            type="submit"
-            className="min-h-12 w-full bg-[var(--accent)] font-semibold text-[#16120d]"
-            isDisabled={!settings.acceptingQuestions || isPending || !text.trim() || !answer.trim()}
-          >
-            {isPending ? 'Отправка...' : 'Отправить вопрос'}
-          </Button>
-        </form>
-        {message && <p className="text-sm text-[#8ad3a0]">{message}</p>}
+
+        {!message ? (
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <TextArea
+              aria-label="Ваш вопрос"
+              placeholder="Напишите ваш вопрос"
+              rows={4}
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              disabled={!settings.acceptingQuestions || isPending}
+              className="w-full"
+            />
+            <TextArea
+              aria-label="Ответ"
+              placeholder="Напишите правильный ответ"
+              rows={3}
+              value={answer}
+              onChange={(event) => setAnswer(event.target.value)}
+              disabled={!settings.acceptingQuestions || isPending}
+              className="w-full"
+            />
+            <Input
+              aria-label="Имя автора"
+              placeholder="Ваше имя (по желанию)"
+              value={author}
+              onChange={(event) => setAuthor(event.target.value)}
+              disabled={!settings.acceptingQuestions || isPending}
+              className="w-full"
+            />
+            <Button
+              type="submit"
+              className="min-h-12 w-full bg-[var(--accent)] font-semibold text-[#16120d]"
+              isDisabled={!settings.acceptingQuestions || isPending || !text.trim() || !answer.trim()}
+            >
+              {isPending ? 'Отправка...' : 'Отправить вопрос'}
+            </Button>
+          </form>
+        ) : (
+          <div className="rounded-2xl border border-[#345d42] bg-[#0f1f15] px-5 py-6 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#5bb179] bg-[#183222] text-2xl text-[#8ad3a0]">
+              ✓
+            </div>
+            <p className="text-2xl font-black text-[#c9f3d8]">Успешно!</p>
+            <p className="mt-2 text-sm text-[#9cd8b0]">
+              Ваш вопрос отправлен и будет проверен администратором
+            </p>
+          </div>
+        )}
         {error && <p className="text-sm text-[#f3b7ab]">{error}</p>}
-      </Card.Content>
-    </Card>
+    </div>
   );
 }

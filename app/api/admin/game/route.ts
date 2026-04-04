@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => null) as {
-    action?: 'pick' | 'reveal' | 'answer' | 'next' | 'reset';
+    action?: 'pick' | 'reveal' | 'answer' | 'next';
   } | null;
 
   if (!body?.action) {

@@ -3,7 +3,18 @@
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button, Card, Chip, Input, TextArea } from '@heroui/react';
+import {
+  Button,
+  Card,
+  Chip,
+  Description,
+  Input,
+  Label,
+  Radio,
+  RadioGroup,
+  Switch,
+  TextArea,
+} from '@heroui/react';
 import { Question, QuestionStatus, SubmissionSettings } from '@/lib/types';
 
 type NewQuestionForm = {
@@ -237,7 +248,7 @@ export function AdminPanelClient() {
                 Режим показа
               </Link>
               <Button
-                variant="ghost"
+                variant="danger"
                 onPress={handleLogout}
                 className="min-h-12 border border-white/10 text-white hover:bg-white/6"
                 isDisabled={isPending}
@@ -292,24 +303,52 @@ export function AdminPanelClient() {
                 }
                 className="w-full"
               />
-              <label className="block space-y-2 text-sm text-[var(--muted)]">
-                <span>Статус</span>
-                <select
-                  aria-label="Статус вопроса"
-                  className="min-h-11 w-full rounded-xl border border-white/10 bg-[#141925] px-3 text-white outline-none focus:border-[var(--accent)]"
-                  value={newQuestion.status}
-                  onChange={(event) =>
-                    setNewQuestion((previous) => ({
-                      ...previous,
-                      status: event.target.value as QuestionStatus,
-                    }))
-                  }
-                >
-                  <option value="approved">Сразу допустить в игру</option>
-                  <option value="pending">Оставить на модерации</option>
-                  <option value="rejected">Отклонить</option>
-                </select>
-              </label>
+              <RadioGroup
+                aria-label="Статус вопроса"
+                value={newQuestion.status}
+                onChange={(event) =>
+                  setNewQuestion((previous) => ({
+                    ...previous,
+                    status: String(event) as QuestionStatus,
+                  }))
+                }
+                orientation="vertical"
+              >
+                <Label>Статус</Label>
+                <Description>
+                  Выберите, как обработать этот вопрос после добавления.
+                </Description>
+
+                <Radio value="approved">
+                  <Radio.Control>
+                    <Radio.Indicator />
+                  </Radio.Control>
+                  <Radio.Content>
+                    <Label>Сразу допустить в игру</Label>
+                    <Description>Вопрос станет доступен для режима показа.</Description>
+                  </Radio.Content>
+                </Radio>
+
+                <Radio value="pending">
+                  <Radio.Control>
+                    <Radio.Indicator />
+                  </Radio.Control>
+                  <Radio.Content>
+                    <Label>Оставить на модерации</Label>
+                    <Description>Вопрос появится в списке и будет ждать решения.</Description>
+                  </Radio.Content>
+                </Radio>
+
+                <Radio value="rejected">
+                  <Radio.Control>
+                    <Radio.Indicator />
+                  </Radio.Control>
+                  <Radio.Content>
+                    <Label>Отклонить</Label>
+                    <Description>Вопрос сохранится в базе со статусом &quot;отклонен&quot;.</Description>
+                  </Radio.Content>
+                </Radio>
+              </RadioGroup>
 
               <Button
                 onPress={handleCreateQuestion}
@@ -325,7 +364,7 @@ export function AdminPanelClient() {
             <Card.Header className="flex flex-col items-start gap-2 px-6 pt-6">
               <Card.Title className="text-2xl font-bold text-white">Прием вопросов</Card.Title>
               <Card.Description className="text-sm text-[var(--muted)]">
-                Управляйте доступностью публичной формы.
+                Управляйте доступностью формой приёма вопросов.
               </Card.Description>
             </Card.Header>
             <Card.Content className="space-y-4 px-6 pb-6">
@@ -333,21 +372,30 @@ export function AdminPanelClient() {
                 <div>
                   <p className="text-sm text-white">Ручной переключатель</p>
                   <p className="text-xs text-[var(--muted)]">
-                    {settings?.acceptingQuestions ? 'Форма открыта' : 'Форма закрыта'}
+                    {settings?.submissionsEnabled
+                      ? 'Прием вопросов включен'
+                      : 'Прием вопросов выключен'}
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  onPress={() =>
+                <Switch
+                  isSelected={Boolean(settings?.submissionsEnabled)}
+                  onChange={(isSelected) =>
                     setSettings((previous) =>
-                      previous ? { ...previous, submissionsEnabled: !previous.submissionsEnabled } : previous
+                      previous ? { ...previous, submissionsEnabled: isSelected } : previous
                     )
                   }
-                  className="bg-[var(--accent)] text-[#16120d]"
                   isDisabled={!settings}
+                  name="submissions-enabled"
                 >
-                  {settings?.submissionsEnabled ? 'Отключить' : 'Включить'}
-                </Button>
+                  <Switch.Control>
+                    <Switch.Thumb />
+                  </Switch.Control>
+                  <Switch.Content>
+                    <Label className="text-sm text-white">
+                      {settings?.submissionsEnabled ? 'Включен' : 'Выключен'}
+                    </Label>
+                  </Switch.Content>
+                </Switch>
               </div>
 
               <label className="block space-y-2 text-sm text-[var(--muted)]">

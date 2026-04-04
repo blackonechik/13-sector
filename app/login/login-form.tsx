@@ -52,7 +52,7 @@ export function LoginForm({ next }: { next: string }) {
           </h1>
         </Card.Header>
         <Card.Content className="px-7 pb-8">
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3 flex flex-col gap-2">
             <Input
               aria-label="Логин"
               placeholder="Логин"
