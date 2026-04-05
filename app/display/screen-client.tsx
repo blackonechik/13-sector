@@ -569,11 +569,9 @@ function QuestionRevealCard({
                   >
                     {question}
                   </h2>
-                  {author && (
-                    <p className="text-base text-[var(--muted)] sm:text-xl">
-                      Автор вопроса: <span className="text-white">{authorLine}</span>
-                    </p>
-                  )}
+                  <p className="text-base text-[var(--muted)] sm:text-xl">
+                    <span className="text-white">{authorLine}</span>
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
