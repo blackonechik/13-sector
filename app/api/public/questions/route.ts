@@ -9,10 +9,11 @@ export async function POST(request: NextRequest) {
     text?: string;
     answer?: string;
     author?: string;
+    city?: string;
   } | null;
 
-  if (!body?.text?.trim() || !body?.answer?.trim()) {
-    return jsonError('Нужно заполнить вопрос и ответ.');
+  if (!body?.text?.trim() || !body?.answer?.trim() || !body?.author?.trim() || !body?.city?.trim()) {
+    return jsonError('Нужно заполнить вопрос, ответ, имя и город.');
   }
 
   const settings = await getSubmissionSettings();
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
     text: body.text,
     answer: body.answer,
     author: body.author,
+    city: body.city,
     status: 'pending',
   });
 

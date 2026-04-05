@@ -2,7 +2,8 @@ export interface Question {
   id: string;
   text: string;
   answer: string;
-  author?: string | null;
+  author: string;
+  city: string;
   createdAt: string;
   updatedAt: string;
   used: boolean;
@@ -33,6 +34,7 @@ export interface GameSnapshot {
 export interface AdminQuestionPayload {
   text: string;
   answer: string;
-  author?: string;
+  author: string;
+  city: string;
   status?: QuestionStatus;
 }

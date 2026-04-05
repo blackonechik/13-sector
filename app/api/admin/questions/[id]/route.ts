@@ -17,6 +17,7 @@ export async function PATCH(
     text?: string;
     answer?: string;
     author?: string | null;
+    city?: string | null;
     status?: 'pending' | 'approved' | 'rejected';
     used?: boolean;
   } | null;

@@ -7,6 +7,7 @@ type QuestionRow = {
   text: string;
   answer: string;
   author: string | null;
+  city: string | null;
   status: QuestionStatus;
   used: boolean;
   created_at: string;
@@ -34,7 +35,8 @@ function mapQuestion(row: QuestionRow): Question {
     id: row.id,
     text: row.text,
     answer: row.answer,
-    author: row.author,
+    author: row.author ?? '',
+    city: row.city ?? '',
     status: row.status,
     used: row.used,
     createdAt: row.created_at,
@@ -104,13 +106,13 @@ async function getGameStateRow(client?: PoolClient) {
 async function listApprovedQuestions(client?: PoolClient) {
   const result = client
     ? await client.query<QuestionRow>(`
-      SELECT id, text, answer, author, status, used, created_at, updated_at
+      SELECT id, text, answer, author, city, status, used, created_at, updated_at
       FROM questions
       WHERE status = 'approved'
       ORDER BY created_at ASC
     `)
     : await query<QuestionRow>(`
-      SELECT id, text, answer, author, status, used, created_at, updated_at
+      SELECT id, text, answer, author, city, status, used, created_at, updated_at
       FROM questions
       WHERE status = 'approved'
       ORDER BY created_at ASC
@@ -210,7 +212,7 @@ export async function updateSubmissionSettings(input: {
 
 export async function listQuestions() {
   const result = await query<QuestionRow>(`
-    SELECT id, text, answer, author, status, used, created_at, updated_at
+    SELECT id, text, answer, author, city, status, used, created_at, updated_at
     FROM questions
     ORDER BY created_at DESC
   `);
@@ -221,20 +223,22 @@ export async function listQuestions() {
 export async function createQuestion(input: {
   text: string;
   answer: string;
-  author?: string | null;
+  author: string;
+  city: string;
   status?: QuestionStatus;
 }) {
   const result = await query<QuestionRow>(
     `
-      INSERT INTO questions (id, text, answer, author, status, used)
-      VALUES ($1, $2, $3, $4, $5, FALSE)
-      RETURNING id, text, answer, author, status, used, created_at, updated_at
+      INSERT INTO questions (id, text, answer, author, city, status, used)
+      VALUES ($1, $2, $3, $4, $5, $6, FALSE)
+      RETURNING id, text, answer, author, city, status, used, created_at, updated_at
     `,
     [
       crypto.randomUUID(),
       input.text.trim(),
       input.answer.trim(),
-      input.author?.trim() || null,
+      input.author.trim(),
+      input.city.trim(),
       input.status ?? 'pending',
     ]
   );
@@ -246,12 +250,13 @@ export async function updateQuestion(id: string, input: {
   text?: string;
   answer?: string;
   author?: string | null;
+  city?: string | null;
   status?: QuestionStatus;
   used?: boolean;
 }) {
   const current = await query<QuestionRow>(
     `
-      SELECT id, text, answer, author, status, used, created_at, updated_at
+      SELECT id, text, answer, author, city, status, used, created_at, updated_at
       FROM questions
       WHERE id = $1
     `,
@@ -270,17 +275,19 @@ export async function updateQuestion(id: string, input: {
         text = $2,
         answer = $3,
         author = $4,
-        status = $5,
-        used = $6,
+        city = $5,
+        status = $6,
+        used = $7,
         updated_at = NOW()
       WHERE id = $1
-      RETURNING id, text, answer, author, status, used, created_at, updated_at
+      RETURNING id, text, answer, author, city, status, used, created_at, updated_at
     `,
     [
       id,
       input.text?.trim() ?? row.text,
       input.answer?.trim() ?? row.answer,
       input.author !== undefined ? input.author?.trim() || null : row.author,
+      input.city !== undefined ? input.city?.trim() || null : row.city,
       input.status ?? row.status,
       input.used ?? row.used,
     ]

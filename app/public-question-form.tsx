@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useState, useTransition } from 'react';
-import { Button, Input, TextArea } from '@heroui/react';
+import { Button, Input, Label, TextField } from '@heroui/react';
 import { SubmissionSettings } from '@/lib/types';
 
 export function PublicQuestionForm({ settings }: { settings: SubmissionSettings }) {
@@ -9,6 +9,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
   const [text, setText] = useState('');
   const [answer, setAnswer] = useState('');
   const [author, setAuthor] = useState('');
+  const [city, setCity] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +34,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
         const response = await fetch('/api/public/questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, answer, author }),
+          body: JSON.stringify({ text, answer, author, city }),
         });
 
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -45,6 +46,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
         setText('');
         setAnswer('');
         setAuthor('');
+        setCity('');
         setMessage('Спасибо! Вопрос отправлен и ждет проверки администратором.');
       } catch {
         setError('Сервер недоступен. Попробуйте еще раз.');
@@ -69,36 +71,50 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
 
         {!message ? (
           <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
-            <TextArea
-              aria-label="Ваш вопрос"
-              placeholder="Напишите ваш вопрос"
-              rows={4}
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-              disabled={!settings.acceptingQuestions || isPending}
-              className="w-full"
-            />
-            <TextArea
-              aria-label="Ответ"
-              placeholder="Напишите правильный ответ"
-              rows={3}
-              value={answer}
-              onChange={(event) => setAnswer(event.target.value)}
-              disabled={!settings.acceptingQuestions || isPending}
-              className="w-full"
-            />
-            <Input
-              aria-label="Имя автора"
-              placeholder="Ваше имя (по желанию)"
-              value={author}
-              onChange={(event) => setAuthor(event.target.value)}
-              disabled={!settings.acceptingQuestions || isPending}
-              className="w-full"
-            />
+            <TextField className="w-full" name="question">
+              <Label>Ваш вопрос</Label>
+              <Input
+                aria-label="Ваш вопрос"
+                placeholder="Сколько дней в году?"
+                value={text}
+                onChange={(event) => setText(event.target.value)}
+                disabled={!settings.acceptingQuestions || isPending}
+              />
+            </TextField>
+            <TextField className="w-full" name="answer">
+              <Label>Ответ</Label>
+              <Input
+                aria-label="Ответ"
+                placeholder="365 дней"
+                value={answer}
+                onChange={(event) => setAnswer(event.target.value)}
+                disabled={!settings.acceptingQuestions || isPending}
+              />
+            </TextField>
+            <TextField className="w-full" name="author">
+              <Label>Ваше имя</Label>
+              <Input
+                aria-label="Имя автора"
+                placeholder="Иван"
+                value={author}
+                onChange={(event) => setAuthor(event.target.value)}
+                disabled={!settings.acceptingQuestions || isPending}
+              />
+            </TextField>
+            <TextField className="w-full" name="city">
+              <Label>Ваш город</Label>
+              <Input
+                aria-label="Город"
+                placeholder="Москва"
+                value={city}
+                onChange={(event) => setCity(event.target.value)}
+                disabled={!settings.acceptingQuestions || isPending}
+              />
+            </TextField>
             <Button
               type="submit"
               className="min-h-12 w-full bg-[var(--accent)] font-semibold text-[#16120d]"
-              isDisabled={!settings.acceptingQuestions || isPending || !text.trim() || !answer.trim()}
+              isDisabled={!settings.acceptingQuestions || isPending || !text.trim() || !answer.trim() || !author.trim() || !city.trim()}
             >
               {isPending ? 'Отправка...' : 'Отправить вопрос'}
             </Button>

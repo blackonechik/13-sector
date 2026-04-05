@@ -25,11 +25,17 @@ async function initializeDatabase() {
       text TEXT NOT NULL,
       answer TEXT NOT NULL,
       author TEXT,
+      city TEXT,
       status TEXT NOT NULL CHECK (status IN ('pending', 'approved', 'rejected')),
       used BOOLEAN NOT NULL DEFAULT FALSE,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+  `);
+
+  await pool.query(`
+    ALTER TABLE questions
+    ADD COLUMN IF NOT EXISTS city TEXT;
   `);
 
   await pool.query(`

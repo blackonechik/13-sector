@@ -21,6 +21,7 @@ type NewQuestionForm = {
   text: string;
   answer: string;
   author: string;
+  city: string;
   status: QuestionStatus;
 };
 
@@ -48,6 +49,7 @@ export function AdminPanelClient() {
     text: '',
     answer: '',
     author: '',
+    city: '',
     status: 'approved',
   });
   const [windowStart, setWindowStart] = useState('');
@@ -119,7 +121,7 @@ export function AdminPanelClient() {
           return;
         }
 
-        setNewQuestion({ text: '', answer: '', author: '', status: 'approved' });
+        setNewQuestion({ text: '', answer: '', author: '', city: '', status: 'approved' });
         setNotice('Вопрос добавлен.');
         await refreshData();
       } catch {
@@ -296,10 +298,19 @@ export function AdminPanelClient() {
               />
               <Input
                 aria-label="Автор"
-                placeholder="Автор вопроса, если нужен"
+                placeholder="Имя автора"
                 value={newQuestion.author}
                 onChange={(event) =>
                   setNewQuestion((previous) => ({ ...previous, author: event.target.value }))
+                }
+                className="w-full"
+              />
+              <Input
+                aria-label="Город автора"
+                placeholder="Город автора"
+                value={newQuestion.city}
+                onChange={(event) =>
+                  setNewQuestion((previous) => ({ ...previous, city: event.target.value }))
                 }
                 className="w-full"
               />
@@ -353,7 +364,7 @@ export function AdminPanelClient() {
               <Button
                 onPress={handleCreateQuestion}
                 className="min-h-12 w-full bg-[var(--accent)] font-semibold text-[#16120d]"
-                isDisabled={!newQuestion.text.trim() || !newQuestion.answer.trim() || isPending}
+                isDisabled={!newQuestion.text.trim() || !newQuestion.answer.trim() || !newQuestion.author.trim() || !newQuestion.city.trim() || isPending}
               >
                 {isPending ? 'Сохраняю...' : 'Добавить вопрос'}
               </Button>
@@ -453,6 +464,7 @@ export function AdminPanelClient() {
                     <th className="px-6 py-4">Вопрос</th>
                     <th className="px-6 py-4">Ответ</th>
                     <th className="px-6 py-4">Автор</th>
+                    <th className="px-6 py-4">Город</th>
                     <th className="px-6 py-4">Статус</th>
                     <th className="px-6 py-4 text-right">Действия</th>
                   </tr>
@@ -464,6 +476,7 @@ export function AdminPanelClient() {
                       <td className="px-6 py-5 text-sm leading-6 text-white">{question.text}</td>
                       <td className="px-6 py-5 text-sm leading-6 text-[#d7dced]">{question.answer}</td>
                       <td className="px-6 py-5 text-sm text-[var(--muted)]">{question.author || '—'}</td>
+                      <td className="px-6 py-5 text-sm text-[var(--muted)]">{question.city || '—'}</td>
                       <td className="px-6 py-5">
                         <Chip
                           variant="soft"

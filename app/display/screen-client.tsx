@@ -6,7 +6,6 @@ import { Button, Card } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GameSnapshot } from '@/lib/types';
 
-const sectorCount = 13;
 const envelopeCount = 24;
 const selectionDurationMs = 4300;
 
@@ -181,7 +180,6 @@ export function DisplayClient() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  const targetSector = snapshot.selectedIndex !== null ? (snapshot.selectedIndex % sectorCount) + 1 : null;
   const hasNoQuestions = snapshot.questions.length === 0;
 
   return (
@@ -280,9 +278,9 @@ export function DisplayClient() {
             >
               <QuestionRevealCard
                 key={snapshot.currentQuestion.id}
-                author={snapshot.currentQuestion.author ?? undefined}
+                author={snapshot.currentQuestion.author}
+                city={snapshot.currentQuestion.city}
                 question={snapshot.currentQuestion.text}
-                sectorLabel={targetSector ? `13 сектор` : 'Вопрос'}
               />
             </motion.div>
           </motion.div>
@@ -521,14 +519,15 @@ function EnvelopeCard({
 
 function QuestionRevealCard({
   author,
+  city,
   question,
-  sectorLabel,
 }: {
-  author?: string;
+  author: string;
+  city: string;
   question: string;
-  sectorLabel: string;
 }) {
   const [textVisible, setTextVisible] = useState(false);
+  const authorLine = city.trim() ? `${author} (г. ${city})` : author;
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -572,7 +571,7 @@ function QuestionRevealCard({
                   </h2>
                   {author && (
                     <p className="text-base text-[var(--muted)] sm:text-xl">
-                      Автор вопроса: <span className="text-white">{author}</span>
+                      Автор вопроса: <span className="text-white">{authorLine}</span>
                     </p>
                   )}
                 </motion.div>
