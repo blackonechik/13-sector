@@ -163,7 +163,8 @@ async function getGameSnapshotWithClient(client?: PoolClient): Promise<GameSnaps
       return 'finished';
     }
 
-    return gameState.game_state === 'finished' ? 'waiting' : gameState.game_state;
+    // No current question but available questions exist - reset to waiting
+    return 'waiting';
   })();
 
   return {
