@@ -315,7 +315,7 @@ export function DisplayClient() {
                   <div className="relative text-center">
                     <p className="text-sm uppercase tracking-[0.42em] text-[var(--accent-soft)]">Ответ</p>
                     <h2
-                      className="mt-5 text-4xl font-black leading-tight text-white sm:text-6xl"
+                      className="mt-5 text-5xl font-black leading-tight text-white"
                       style={{ fontFamily: 'var(--font-playfair)' }}
                     >
                       {snapshot.currentQuestion.answer}
@@ -545,7 +545,7 @@ function QuestionRevealCard({
           initial={{ y: 38, scale: 0.88 }}
           animate={{ y: 0, scale: 1 }}
           transition={{ duration: 0.9, ease: [0.18, 0.82, 0.2, 1] }}
-          className="mx-auto max-w-xl"
+          className="mx-auto"
         >
           <div>
             <AnimatePresence>
@@ -558,13 +558,13 @@ function QuestionRevealCard({
                   className="space-y-6 text-center"
                 >
                   <p
-                    className="mt-1 text-2xl font-black uppercase text-[var(--accent-soft)] sm:text-3xl"
+                    className="mt-1 text-2xl font-black uppercase text-[var(--accent-soft)]"
                     style={{ fontFamily: 'var(--font-playfair)' }}
                   >
                     Вопрос:
                   </p>
                   <h2
-                    className="text-4xl font-black leading-tight text-white sm:text-6xl"
+                    className="text-5xl font-black leading-tight text-white"
                     style={{ fontFamily: 'var(--font-playfair)' }}
                   >
                     {question}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGameSnapshot, runGameAction } from '@/lib/questions';
+import { getGameSnapshot, resetGameState, runGameAction } from '@/lib/questions';
 import { jsonError, requireAdminApi } from '@/lib/guards';
 
 export const dynamic = 'force-dynamic';
@@ -22,11 +22,16 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => null) as {
-    action?: 'pick' | 'reveal' | 'answer' | 'next';
+    action?: 'pick' | 'reveal' | 'answer' | 'next' | 'reset';
   } | null;
 
   if (!body?.action) {
     return jsonError('Не передано действие.');
+  }
+
+  if (body.action === 'reset') {
+    const snapshot = await resetGameState();
+    return NextResponse.json({ snapshot });
   }
 
   const snapshot = await runGameAction(body.action);

@@ -412,3 +412,47 @@ export async function runGameAction(action: 'pick' | 'reveal' | 'answer' | 'next
     return getGameSnapshotWithClient(client);
   });
 }
+
+export async function resetGameState() {
+  return withTransaction(async (client) => {
+    await client.query(
+      `
+        UPDATE game_state
+        SET
+          current_question_id = NULL,
+          game_state = 'waiting',
+          selected_index = NULL,
+          updated_at = NOW()
+        WHERE id = 1
+      `
+    );
+
+    return getGameSnapshotWithClient(client);
+  });
+}
+
+export async function toggleQuestionUsed(id: string) {
+  return withTransaction(async (client) => {
+    const result = await client.query<{ used: boolean }>(
+      `SELECT used FROM questions WHERE id = $1`,
+      [id]
+    );
+
+    const row = result.rows[0];
+    if (!row) {
+      return null;
+    }
+
+    const updateResult = await client.query<QuestionRow>(
+      `
+        UPDATE questions
+        SET used = $2, updated_at = NOW()
+        WHERE id = $1
+        RETURNING id, text, answer, author, city, status, used, created_at, updated_at
+      `,
+      [id, !row.used]
+    );
+
+    return mapQuestion(updateResult.rows[0]);
+  });
+}

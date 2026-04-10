@@ -207,6 +207,55 @@ export function AdminPanelClient() {
     });
   };
 
+  const handleToggleUsed = (id: string, currentUsed: boolean) => {
+    setNotice(null);
+    setError(null);
+
+    startTransition(async () => {
+      try {
+        const response = await fetch('/api/admin/game/toggle-used', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ questionId: id }),
+        });
+
+        if (!response.ok) {
+          setError('Не удалось обновить статус вопроса.');
+          return;
+        }
+
+        await refreshData();
+      } catch {
+        setError('Ошибка обновления статуса.');
+      }
+    });
+  };
+
+  const handleResetGame = () => {
+    setNotice(null);
+    setError(null);
+
+    startTransition(async () => {
+      try {
+        const response = await fetch('/api/admin/game', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'reset' }),
+        });
+
+        if (!response.ok) {
+          setError('Не удалось перезагрузить игру.');
+          return;
+        }
+
+        setNotice('Игра перезапущена.');
+        await refreshData();
+      } catch {
+        setError('Ошибка перезагрузки игры.');
+      }
+    });
+  };
+
   const handleLogout = () => {
     startTransition(async () => {
       await fetch('/api/auth/logout', { method: 'POST' });
@@ -249,6 +298,14 @@ export function AdminPanelClient() {
               >
                 Режим показа
               </Link>
+              <Button
+                variant="danger"
+                onPress={handleResetGame}
+                className="min-h-12 border border-white/10 text-white hover:bg-white/6"
+                isDisabled={isPending}
+              >
+                Перезагрузить игру
+              </Button>
               <Button
                 variant="danger"
                 onPress={handleLogout}
@@ -499,6 +556,17 @@ export function AdminPanelClient() {
                       </td>
                       <td className="px-6 py-5 text-right">
                         <div className="flex flex-wrap justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className={question.used
+                              ? 'border border-[#375840] text-[#9ee3af] hover:bg-[#1f2e45]'
+                              : 'border border-white/10 text-[var(--muted)] hover:bg-white/6'
+                            }
+                            onPress={() => handleToggleUsed(question.id, question.used)}
+                          >
+                            {question.used ? 'Не сыгран' : 'Сыгран'}
+                          </Button>
                           <Button
                             size="sm"
                             variant="ghost"
