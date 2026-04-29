@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createQuestion, listQuestions } from '@/lib/questions';
 import { requireAdminApi, jsonError } from '@/lib/guards';
+import { QUESTION_ANSWER_MAX_LENGTH, QUESTION_TEXT_MAX_LENGTH } from '@/lib/question-limits';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +32,14 @@ export async function POST(request: NextRequest) {
 
   if (!body?.text?.trim() || !body?.answer?.trim() || !body?.author?.trim() || !body?.city?.trim()) {
     return jsonError('Нужно заполнить вопрос, ответ, имя и город.');
+  }
+
+  if (body.text.trim().length > QUESTION_TEXT_MAX_LENGTH) {
+    return jsonError(`Текст вопроса не должен превышать ${QUESTION_TEXT_MAX_LENGTH} символов.`);
+  }
+
+  if (body.answer.trim().length > QUESTION_ANSWER_MAX_LENGTH) {
+    return jsonError(`Ответ не должен превышать ${QUESTION_ANSWER_MAX_LENGTH} символов.`);
   }
 
   const question = await createQuestion({

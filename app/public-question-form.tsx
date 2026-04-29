@@ -1,7 +1,9 @@
 'use client';
 
 import { FormEvent, useState, useTransition } from 'react';
+import Link from 'next/link';
 import { Button, Input, Label, TextField } from '@heroui/react';
+import { QUESTION_ANSWER_MAX_LENGTH, QUESTION_TEXT_MAX_LENGTH } from '@/lib/question-limits';
 import { SubmissionSettings } from '@/lib/types';
 
 export function PublicQuestionForm({ settings }: { settings: SubmissionSettings }) {
@@ -10,6 +12,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
   const [answer, setAnswer] = useState('');
   const [author, setAuthor] = useState('');
   const [city, setCity] = useState('');
+  const [consentAccepted, setConsentAccepted] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,12 +32,17 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
     setMessage(null);
     setError(null);
 
+    if (!consentAccepted) {
+      setError('Нужно согласиться с политикой конфиденциальности и обработкой персональных данных.');
+      return;
+    }
+
     startTransition(async () => {
       try {
         const response = await fetch('/api/public/questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, answer, author, city }),
+          body: JSON.stringify({ text, answer, author, city, consentAccepted }),
         });
 
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -47,6 +55,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
         setAnswer('');
         setAuthor('');
         setCity('');
+        setConsentAccepted(false);
         setMessage('Спасибо! Вопрос отправлен и ждет проверки администратором.');
       } catch {
         setError('Сервер недоступен. Попробуйте еще раз.');
@@ -62,9 +71,9 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
         >
           Форма для отправки вопроса
         </h2>
-        <p className="text-sm text-[var(--muted)]">{availabilityLabel}</p>
+        <p className="text-sm text-muted">{availabilityLabel}</p>
         {(startLabel || endLabel) && (
-          <p className="text-xs text-[var(--muted)]">
+          <p className="text-xs text-muted">
             {startLabel ? `С: ${startLabel}` : 'С: сразу'} {endLabel ? `• До: ${endLabel}` : ''}
           </p>
         )}
@@ -75,6 +84,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
               <Label>Ваш вопрос</Label>
               <Input
                 aria-label="Ваш вопрос"
+                maxLength={QUESTION_TEXT_MAX_LENGTH}
                 placeholder="Сколько дней в году?"
                 value={text}
                 onChange={(event) => setText(event.target.value)}
@@ -85,6 +95,7 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
               <Label>Ответ</Label>
               <Input
                 aria-label="Ответ"
+                maxLength={QUESTION_ANSWER_MAX_LENGTH}
                 placeholder="365 дней"
                 value={answer}
                 onChange={(event) => setAnswer(event.target.value)}
@@ -111,10 +122,33 @@ export function PublicQuestionForm({ settings }: { settings: SubmissionSettings 
                 disabled={!settings.acceptingQuestions || isPending}
               />
             </TextField>
+            <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-muted">
+              <input
+                type="checkbox"
+                checked={consentAccepted}
+                onChange={(event) => setConsentAccepted(event.target.checked)}
+                disabled={!settings.acceptingQuestions || isPending}
+                className="mt-1 h-4 w-4 rounded border border-white/20 bg-transparent accent-accent"
+              />
+              <span className="leading-6">
+                Я согласен(на) с обработкой персональных данных и подтверждаю, что ознакомился(лась) с{' '}
+                <Link href="/privacy" className="text-accent-soft underline underline-offset-4">
+                  политикой конфиденциальности
+                </Link>{' '}
+                и{' '}
+                <Link
+                  href="/personal-data-consent"
+                  className="text-accent-soft underline underline-offset-4"
+                >
+                  согласием на обработку персональных данных
+                </Link>
+                .
+              </span>
+            </label>
             <Button
               type="submit"
-              className="min-h-12 w-full bg-[var(--accent)] font-semibold text-[#16120d]"
-              isDisabled={!settings.acceptingQuestions || isPending || !text.trim() || !answer.trim() || !author.trim() || !city.trim()}
+              className="min-h-12 w-full bg-accent font-semibold text-[#16120d]"
+              isDisabled={!settings.acceptingQuestions || isPending || !text.trim() || !answer.trim() || !author.trim() || !city.trim() || !consentAccepted}
             >
               {isPending ? 'Отправка...' : 'Отправить вопрос'}
             </Button>

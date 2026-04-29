@@ -26,6 +26,8 @@ async function initializeDatabase() {
       answer TEXT NOT NULL,
       author TEXT,
       city TEXT,
+      consent_accepted_at TIMESTAMPTZ,
+      consent_policy_version TEXT,
       status TEXT NOT NULL CHECK (status IN ('pending', 'approved', 'rejected')),
       used BOOLEAN NOT NULL DEFAULT FALSE,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -36,6 +38,16 @@ async function initializeDatabase() {
   await pool.query(`
     ALTER TABLE questions
     ADD COLUMN IF NOT EXISTS city TEXT;
+  `);
+
+  await pool.query(`
+    ALTER TABLE questions
+    ADD COLUMN IF NOT EXISTS consent_accepted_at TIMESTAMPTZ;
+  `);
+
+  await pool.query(`
+    ALTER TABLE questions
+    ADD COLUMN IF NOT EXISTS consent_policy_version TEXT;
   `);
 
   await pool.query(`

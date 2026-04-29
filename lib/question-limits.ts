@@ -1,0 +1,2 @@
+export const QUESTION_TEXT_MAX_LENGTH = 300;
+export const QUESTION_ANSWER_MAX_LENGTH = 100;

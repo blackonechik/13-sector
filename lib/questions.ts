@@ -1,5 +1,6 @@
 import { PoolClient } from 'pg';
 import { GameSnapshot, GameState, Question, QuestionStatus, SubmissionSettings } from '@/lib/types';
+import { QUESTION_ANSWER_MAX_LENGTH, QUESTION_TEXT_MAX_LENGTH } from '@/lib/question-limits';
 import { query, withTransaction } from '@/lib/db';
 
 type QuestionRow = {
@@ -227,19 +228,33 @@ export async function createQuestion(input: {
   author: string;
   city: string;
   status?: QuestionStatus;
+  consentAcceptedAt?: string | null;
+  consentPolicyVersion?: string | null;
 }) {
+  const text = input.text.trim();
+  const answer = input.answer.trim();
+  if (text.length > QUESTION_TEXT_MAX_LENGTH) {
+    throw new Error(`Текст вопроса не должен превышать ${QUESTION_TEXT_MAX_LENGTH} символов.`);
+  }
+
+  if (answer.length > QUESTION_ANSWER_MAX_LENGTH) {
+    throw new Error(`Ответ не должен превышать ${QUESTION_ANSWER_MAX_LENGTH} символов.`);
+  }
+
   const result = await query<QuestionRow>(
     `
-      INSERT INTO questions (id, text, answer, author, city, status, used)
-      VALUES ($1, $2, $3, $4, $5, $6, FALSE)
+      INSERT INTO questions (id, text, answer, author, city, consent_accepted_at, consent_policy_version, status, used)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, FALSE)
       RETURNING id, text, answer, author, city, status, used, created_at, updated_at
     `,
     [
       crypto.randomUUID(),
-      input.text.trim(),
-      input.answer.trim(),
+      text,
+      answer,
       input.author.trim(),
       input.city.trim(),
+      input.consentAcceptedAt ? new Date(input.consentAcceptedAt).toISOString() : null,
+      input.consentPolicyVersion ?? null,
       input.status ?? 'pending',
     ]
   );

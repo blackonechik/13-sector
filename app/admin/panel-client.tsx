@@ -16,6 +16,7 @@ import {
   TextArea,
 } from '@heroui/react';
 import { Question, QuestionStatus, SubmissionSettings } from '@/lib/types';
+import { QUESTION_ANSWER_MAX_LENGTH, QUESTION_TEXT_MAX_LENGTH } from '@/lib/question-limits';
 
 type NewQuestionForm = {
   text: string;
@@ -335,6 +336,7 @@ export function AdminPanelClient() {
             <Card.Content className="space-y-4 px-6 pb-6">
               <TextArea
                 aria-label="Текст вопроса"
+                maxLength={QUESTION_TEXT_MAX_LENGTH}
                 placeholder="Введите формулировку вопроса"
                 value={newQuestion.text}
                 onChange={(event) =>
@@ -345,6 +347,7 @@ export function AdminPanelClient() {
               />
               <TextArea
                 aria-label="Правильный ответ"
+                maxLength={QUESTION_ANSWER_MAX_LENGTH}
                 placeholder="Введите правильный ответ"
                 value={newQuestion.answer}
                 onChange={(event) =>
