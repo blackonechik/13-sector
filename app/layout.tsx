@@ -15,6 +15,19 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   title: "Что Где Когда",
   description: "Приём вопросов для 13 сектора ЧГК",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      'max-video-preview': 0,
+      'max-image-preview': 'none',
+      'max-snippet': 0,
+    },
+  },
 };
 
 export default function RootLayout({
